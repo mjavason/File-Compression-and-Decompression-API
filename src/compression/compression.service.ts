@@ -22,4 +22,14 @@ export class CompressionService {
 
     await pipeline(source, gunzip, destination);
   }
+
+  stripFileExtension(fileName: string) {
+    // Remove everything from the last full stop (period) in the string
+    const baseFileName = fileName.replace(/\.([^.]*)$/, '');
+
+    console.log(`Original file name: ${fileName}`);
+    console.log(`Base file name (without extension): ${baseFileName}`);
+
+    return baseFileName;
+  }
 }

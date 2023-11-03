@@ -1,4 +1,6 @@
 import { config } from 'dotenv';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 config();
 
@@ -61,3 +63,11 @@ export const LINKS = {
   WHATSAPP_CHAT: 'https://wa.me/2349999999999',
   ZOOM: 'https://zoom.us/j/9999999999',
 };
+
+export const storage = diskStorage({
+  destination: './uploads', // Specify the directory where files should be saved
+  filename: (req, file, callback) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    callback(null, uniqueSuffix + extname(file.originalname));
+  },
+});

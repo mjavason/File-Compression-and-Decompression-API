@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   Controller,
+  HttpStatus,
   Post,
   Res,
   UploadedFile,
@@ -7,18 +9,27 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadService } from 'src/upload/upload.service';
 import { CompressionService } from './compression.service';
-import { ApiConsumes, ApiBody, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiBody,
+  ApiOperation,
+  ApiInternalServerErrorResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import * as fs from 'fs';
+import { storage } from 'src/constants';
 
+@ApiTags('Compression')
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'Successful response with data',
+})
+@ApiInternalServerErrorResponse({ description: 'Internal Server Error' })
 @Controller('compression')
 export class CompressionController {
-  constructor(
-    private readonly fileCompressionService: CompressionService,
-    private readonly fileUploadService: UploadService,
-  ) {}
-
-  multerOptionsInitialised = this.fileUploadService.multerOptions;
+  constructor(private readonly fileCompressionService: CompressionService) {}
 
   @Post('upload')
   @ApiConsumes('multipart/form-data')
@@ -33,10 +44,13 @@ export class CompressionController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { storage }))
   @ApiOperation({ summary: 'Upload a file' })
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    // console.log(this.fileUploadService.multerOptions);
+    if (!file) {
+      throw new BadRequestException('File not uploaded');
+    }
+
     // Handle file upload
     return { message: 'File uploaded successfully' };
   }
@@ -54,31 +68,45 @@ export class CompressionController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload a file' })
+  @UseInterceptors(FileInterceptor('file', { storage }))
+  @ApiOperation({ summary: 'Upload a file to be compressed' })
   async compressFile(
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
   ) {
-    console.log(file);
+    if (!file) {
+      throw new BadRequestException('File not uploaded');
+    }
+
+    const compressedFilePath = file.path + '.gz';
 
     // Compress the uploaded file
     await this.fileCompressionService.compressFile(
       file.path,
-      file.path + '.gz',
+      compressedFilePath,
     );
-
-    const compressedFilePath = file.path + '.gz';
 
     // Send the compressed file for download
     res.download(compressedFilePath, `${file.originalname}.gz`, (err) => {
       if (err) {
         // Handle errors if necessary
         res.status(404).send('File not found');
+      } else {
+        // Delete the compressed file after it has been sent for download
+        fs.unlink(compressedFilePath, (err) => {
+          if (err) {
+            console.error(`Error deleting the compressed file: ${err.message}`);
+          }
+        });
+
+        // Delete the uploaded file
+        fs.unlink(file.path, (err) => {
+          if (err) {
+            console.error(`Error deleting the uploaded file: ${err.message}`);
+          }
+        });
       }
     });
-
-    return { message: 'File compressed successfully' };
   }
 
   @Post('decompress')
@@ -94,12 +122,16 @@ export class CompressionController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { storage }))
   @ApiOperation({ summary: 'Decompress a compressed file' })
   async decompressFile(
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
   ) {
+    if (!file) {
+      throw new BadRequestException('File not uploaded');
+    }
+
     // Decompress the uploaded file
     await this.fileCompressionService.decompressFile(
       file.path,
@@ -107,13 +139,25 @@ export class CompressionController {
     );
     const decompressedFilePath = file.path.replace('.gz', '');
 
-    console.log(file);
-
     // Send the decompressed file for download
     res.download(decompressedFilePath, file.originalname, (err) => {
       if (err) {
         // Handle errors if necessary
         res.status(404).send('File not found');
+      } else {
+        // Delete the compressed file after it has been sent for download
+        fs.unlink(decompressedFilePath, (err) => {
+          if (err) {
+            console.error(`Error deleting the compressed file: ${err.message}`);
+          }
+        });
+
+        // Delete the uploaded file
+        fs.unlink(file.path, (err) => {
+          if (err) {
+            console.error(`Error deleting the uploaded file: ${err.message}`);
+          }
+        });
       }
     });
 

@@ -1,0 +1,10 @@
+{
+  fieldname: 'file',
+  originalname: '0_WApCbgaQuouzljvM.png',
+  encoding: '7bit',
+  mimetype: 'image/png',
+  destination: './uploads',
+  filename: '1699016780735-849212172.png',
+  path: 'uploads\\1699016780735-849212172.png',
+  size: 347429
+}
