@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   HttpStatus,
+  NotFoundException,
   Post,
   Res,
   UploadedFile,
@@ -47,9 +48,7 @@ export class CompressionController {
   @UseInterceptors(FileInterceptor('file', { storage }))
   @ApiOperation({ summary: 'Upload a file' })
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('File not uploaded');
-    }
+    if (!file) throw new BadRequestException('File not uploaded');
 
     // Handle file upload
     return { message: 'File uploaded successfully' };
@@ -74,9 +73,7 @@ export class CompressionController {
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
   ) {
-    if (!file) {
-      throw new BadRequestException('File not uploaded');
-    }
+    if (!file) throw new BadRequestException('File not uploaded');
 
     const compressedFilePath = file.path + '.gz';
 
@@ -90,20 +87,18 @@ export class CompressionController {
     res.download(compressedFilePath, `${file.originalname}.gz`, (err) => {
       if (err) {
         // Handle errors if necessary
-        res.status(404).send('File not found');
+        throw new NotFoundException('File not found');
       } else {
         // Delete the compressed file after it has been sent for download
         fs.unlink(compressedFilePath, (err) => {
-          if (err) {
+          if (err)
             console.error(`Error deleting the compressed file: ${err.message}`);
-          }
         });
 
         // Delete the uploaded file
         fs.unlink(file.path, (err) => {
-          if (err) {
+          if (err)
             console.error(`Error deleting the uploaded file: ${err.message}`);
-          }
         });
       }
     });
@@ -128,39 +123,516 @@ export class CompressionController {
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
   ) {
-    if (!file) {
-      throw new BadRequestException('File not uploaded');
-    }
+    if (!file) throw new BadRequestException('File not uploaded');
 
     // Decompress the uploaded file
     await this.fileCompressionService.decompressFile(
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       file.path,
       file.path.replace('.gz', ''),
     );
     const decompressedFilePath = file.path.replace('.gz', '');
+    const baseFileName = this.fileCompressionService.stripFileExtension(
+      file.originalname,
+    );
 
     // Send the decompressed file for download
-    res.download(decompressedFilePath, file.originalname, (err) => {
+    return res.download(decompressedFilePath, baseFileName, (err) => {
       if (err) {
         // Handle errors if necessary
-        res.status(404).send('File not found');
+        throw new BadRequestException(
+          `Error decompressing file: ${err.message}`,
+        );
       } else {
         // Delete the compressed file after it has been sent for download
         fs.unlink(decompressedFilePath, (err) => {
-          if (err) {
+          if (err)
             console.error(`Error deleting the compressed file: ${err.message}`);
-          }
         });
 
         // Delete the uploaded file
         fs.unlink(file.path, (err) => {
-          if (err) {
+          if (err)
             console.error(`Error deleting the uploaded file: ${err.message}`);
-          }
         });
       }
     });
-
-    return { message: 'File decompressed successfully' };
   }
 }
