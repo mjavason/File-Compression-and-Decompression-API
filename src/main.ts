@@ -3,10 +3,13 @@ import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationError } from 'class-validator';
+import * as express from 'express';
 import { PORT } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
   app.useGlobalPipes(
     new ValidationPipe({
